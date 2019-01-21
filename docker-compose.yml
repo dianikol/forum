@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+    db_testing:
+        image: mysql:5.7
+        container_name: forum_db_test
+        ports:
+            - 3307:3306
+        volumes:
+            - ./database_testing:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=forum_test
+    db:
+        image: mysql:5.7
+        container_name: forum_db
+        ports:
+            - 3306:3306
+        volumes:
+            - ./database:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=forum
+    php-apache-server:
+        build: ./environment/php-apache-server
+        container_name: forum_server_php
+        environment:
+            - VIRTUAL_HOST=forum.loc
+        ports:
+            - 80:80
+        volumes:
+            - ./www/:/var/www/forum/
+            #- ./environment/php-apache/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+            - ./environment/php-apache-server/ssmtp.conf:/etc/ssmtp/ssmtp.conf
+            - ./environment/php-apache-server/php.ini:/usr/local/etc/php/php.ini
+            - ./environment/php-apache-server/apache-config.conf:/etc/apache2/sites-enabled/000-default.conf
